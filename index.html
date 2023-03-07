@@ -1,0 +1,79 @@
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+
+<link rel="stylesheet" href="https://uicdn.toast.com/editor-plugin-code-syntax-highlight/latest/toastui-editor-plugin-code-syntax-highlight.min.css">
+<script src="https://uicdn.toast.com/editor-plugin-code-syntax-highlight/latest/toastui-editor-plugin-code-syntax-highlight-all.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.13/katex.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.13/katex.min.css">
+
+<style>
+    @font-face {
+  font-family:"GmarketSansMedium";
+  src:url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff") format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+body{
+  margin: 0;
+}
+#viewer{
+  padding: 0 10px;
+}
+html > body,
+html > body .toastui-editor-contents,
+html > body .toastui-editor-contents code,
+html > body .toastui-editor-contents pre {
+  font-family: "GmarketSansMedium";
+}
+</style>
+
+<script>
+    const Editor = toastui.Editor;
+function katexPlugin() {
+  const toHTMLRenderers = {
+    katex(node) {
+      console.log("HI");
+
+      let html = katex.renderToString(node.literal, {
+        throwOnError: false
+      });
+
+      return [
+        { type: "openTag", tagName: "div", outerNewLine: true },
+        { type: "html", content: html },
+        { type: "closeTag", tagName: "div", outerNewLine: true }
+      ];
+    }
+  };
+
+  return { toHTMLRenderers };
+}
+const viewrTemplateEl = document.querySelector("#viewer-template");
+const viewer1MarkdownSource = viewrTemplateEl.innerHTML;
+
+const viewer = Editor.factory({
+  el: document.querySelector('#viewer'),
+  viewer: true,
+  initialValue: viewer1MarkdownSource,
+  plugins: [
+    [toastui.Editor.plugin.codeSyntaxHighlight, { highlighter: Prism }],
+    katexPlugin
+  ]
+});
+</script>
+
+<template id="viewer-template">
+  이렇게 내용을 작성하니 편하네요
+   ```java
+  // 주석입니다.
+  int a = 10;
+  int b = 20;
+  System.out.println(a + b);
+  ```
+$$katex
+x^2 + y^2 = 1
+$$
+</template>
+<div id="viewer"></div>
