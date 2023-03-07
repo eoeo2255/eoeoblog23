@@ -60,6 +60,21 @@
     const Editor = toastui.Editor;
 
     function katexPlugin() {
+      const toHTMLRenderers = {
+        katex(node) {
+          console.log("HI");
+
+          let html = katex.renderToString(node.literal, {
+            throwOnError: false
+          });
+
+          return [
+            { type: "openTag", tagName: "div", outerNewLine: true },
+            { type: "html", content: html },
+            { type: "closeTag", tagName: "div", outerNewLine: true }
+          ];
+        }
+      };
         return { toHTMLRenderers };
     }
 
@@ -67,8 +82,18 @@
 
     const viewer1 = Editor.factory({
     el: document.querySelector("#viewer"),
+    viewer: true,
+      initialValue: viewer1MarkdownSource,
+      plugins: [
+        [toastui.Editor.plugin.codeSyntaxHighlight, { highlighter: Prism }],
+        katexPlugin,
+        [
+          toastui.Editor.plugin.uml,
+          { rendererURL: "http://www.plantuml.com/plantuml/svg/" }
+        ]
+      ]
   });
-  
+
   function showPage(pageNo) {
       fetch(pageNo + ".md")
         .then(response => response.text()) // 응답에서 본문만 취한다.
@@ -81,6 +106,7 @@
           });
         })
     }
+    showPage(3);
   </script>
 </body>
 </html>
