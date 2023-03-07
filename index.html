@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+    <title>박예림 블로그</title>
+
     <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
 
@@ -15,7 +16,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.13/katex.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.13/katex.min.css">
 
-    <title>박예림 블로그</title>
+    <script src="https://uicdn.toast.com/editor-plugin-uml/latest/toastui-editor-plugin-uml.min.js"></script>
 
     <style>
         @font-face {
@@ -39,24 +40,60 @@
     </style>
 
 </head>
+
+
 <body>
     <template id="viewer-template">
+
         이렇게 내용을 작성하니 편하네요
-         ```java
+            ```java
         // 주석입니다.
         int a = 10;
         int b = 20;
         System.out.println(a + b);
         ```
-      $$katex
-      x^2 + y^2 = 1
-      $$
-      </template>
-      <div id="viewer"></div>
 
-      
-      <script>
+        $$katex
+        x^2 + y^2 = 1
+        $$
+
+
+        $$uml
+        (First usecase)
+        (Another usecase) as (UC2)
+        usecase UC3
+        usecase (Last\nusecase) as UC4
+        $$
+
+
+    </template>
+
+    <div id="viewer"></div>
+
+
+    <script>
+        function stripIndent(str) {
+        const lines = str.split("\n");
+        let minIndent = Infinity;
+
+        for (let i = 1; i < lines.length; i++) {
+            const line = lines[i];
+            const indent = line.search(/\S/);
+
+            if (indent !== -1 && indent < minIndent) {
+            minIndent = indent;
+            }
+        }
+        if (minIndent !== Infinity) {
+            for (let i = 0; i < lines.length; i++) {
+            lines[i] = lines[i].slice(minIndent);
+        }
+      }
+      return lines.join("\n");
+    }
+
         const Editor = toastui.Editor;
+
         function katexPlugin() {
         const toHTMLRenderers = {
             katex(node) {
@@ -76,8 +113,9 @@
     
         return { toHTMLRenderers };
         }
+
         const viewrTemplateEl = document.querySelector("#viewer-template");
-        const viewer1MarkdownSource = viewrTemplateEl.innerHTML;
+        const viewer1MarkdownSource = stripIndent(viewer1TemplateEl.innerHTML);
     
         const viewer = Editor.factory({
         el: document.querySelector('#viewer'),
@@ -85,7 +123,11 @@
         initialValue: viewer1MarkdownSource,
         plugins: [
             [toastui.Editor.plugin.codeSyntaxHighlight, { highlighter: Prism }],
-            katexPlugin
+            katexPlugin,
+            [
+            toastui.Editor.plugin.uml,
+            { rendererURL: "http://www.plantuml.com/plantuml/svg/" }
+            ]
         ]
         });
     </script>
